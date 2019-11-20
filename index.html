@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>LOL英雄池</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <style>
+        .container {
+            margin-top: 50px;
+            width: 850px;
+        }
+
+        .container .form-inline {
+            margin-bottom: 20px;
+        }
+
+        .table.table-bordered th,
+        .table.table-bordered td {
+            text-align: center;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="container">
+        <form class="form-inline">
+            <div class="form-group">
+                <label>名称</label>
+                <input type="text" class="form-control" v-model="name">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <input type="text" class="form-control " v-model="desc">
+            </div>
+            <button class="btn btn-primary" @click. ="addData">添加</button>
+        </form>
+
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th width="10%">序号</th>
+                    <th width="20%">名称</th>
+                    <th width="30%">描述</th>
+                    <th width="30%">创建时间</th>
+                    <th width="10%">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item,i in lolData" :key="item.id">
+                    <td>{{i+1}}</td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.desc}}</td>
+                    <td>{{item.date}}</td>
+                    <td><a href="#" @click.prevent="del(item.id)">删除</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+    <script>
+        let vm = new Vue({
+            el: "#app",
+            data: {
+                name: "",
+                desc: "",
+                lolData: [{
+                    id: 1,
+                    name: "蛮王",
+                    desc: "我的大刀早已饥渴难耐了",
+                    date: new Date()
+                }, {
+                    id: 2,
+                    name: "盲僧",
+                    desc: "我用双手成就你的梦想",
+                    date: new Date()
+                }, {
+                    id: 3,
+                    name: "赵信",
+                    desc: "一点寒芒先到,随后枪出如龙",
+                    date: new Date()
+                }]
+            },
+            methods: {
+                addData() {
+                    this.lolData.push({
+                        id: this.lolData.length + 1,
+                        name:this.name,
+                        desc:this.desc,
+                        date: new Date()                    
+                    });
+                },
+                del(id){
+                    let idx = this.lolData.findIndex((item)=>item.id === id);
+                    this.lolData.splice(idx,1)
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>
