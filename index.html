@@ -43,9 +43,15 @@
                 <input type="text" class="form-control " v-model="desc" @keyup.enter.exact="addData">
             </div>
             <button class="btn btn-primary" @click.prevent="addData">添加</button>
+            <!-- 关键字搜索功能 -->
+            <div class="form-group" style="margin-left:60px;margin-top:10px">
+                <label>关键字搜索</label>
+                <input type="text" class="form-control" v-model="key">
+            </div>
+
         </form>
         <!-- 数据展示区 -->
-        <table class="table table-striped table-bordered">
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th width="10%">序号</th>
@@ -61,98 +67,110 @@
                     <td colspan="5">大爷,来玩啊~</td>
                 </tr>
                 <!-- 内容展示 -->
-                <tr v-else v-for="item,i in lolData" :key="item.id" :style="{backgroundColor:i%2==0?'#ccc':'white'}">
+                <tr v-else v-for="item,i in searchList" :key="item.id" :style="{backgroundColor:i%2==0?'#ccc':'white'}">
                     <td>{{i+1}}</td>
                     <td>{{item.name}}</td>
                     <td>{{item.desc}}</td>
                     <!-- | linux 命令  管道符 -->
-                    <td>{{item.date | timeFilter}}</td>
+                    <td>{{item.time | timeFilter}}</td>
                     <td><a href="#" @click.prevent="del(item.id)">删除</a></td>
                 </tr>
             </tbody>
         </table>
     </div>
-    <!-- 引入vuejs文件 -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
-    <!-- 日期时间的插件 可以用来设置获取 格式化日期时间的 -->
-    <script src="./node_modules/moment/moment.js"></script>
-    <!-- 引入axios插件 -->
-    <script src="./node_modules/axios/dist/axios.js"></script>
-    <script>
-        // 定义一个全局过滤器 转换时间显示
-        // 参数1 过滤器的名称
-        // 参数2: 过滤器过滤时执行的函数
-        Vue.filter('timeFilter', (input, yourFormat = 'YYYY年MM月DD日  HH:mm:ss') => {
-            return moment(input).format(yourFormat)
-        })
-        // 定义一个axios全局默认配置
-        axios.defaults.baseURL = 'http://localhost:5000';
-       
-        // 创建根实例
-        let vm = new Vue({
-            el: "#app",
-            data: {
-                name: "",
-                desc: "",
-                lolData: []
-            },
-            created() {
-                this.getAllList()
-            },
-            methods: {
-                getAllList() {
-                    axios.get('/getBrandList')
-                        .then(rel => {
-                            console.log(rel);
-                            this.lolData = rel.data.list
-                        }).catch(err => {
-                            console.log(err);
-                        })
-                },
-                addData() {
-                    //  为空校验
-                    if (!this.name.trim() || !this.desc.trim()) return alert("请输入正确的信息");
-
-                    // 添加数据
-                    // this.lolData.push({
-                    //     id: this.lolData.length + 1,
-                    //     name: this.name,
-                    //     desc: this.desc,
-                    //     date: new Date()
-                    // });
-
-                    // 向后端发起请求 添加品牌
-                    axios.post('addBrand', {
-                            name: this.name,
-                            desc: this.desc,
-                            time: new Date()
-                        })
-                        .then(rel => {
-                            console.log(rel);
-                            this.getAllList()
-                        })
-
-                    this.name = "";
-                    this.desc = ""
-                },
-                del(id) {
-                    // 根据当前的项的id来删除这一条数据
-                    // find  findIndex
-                    // let idx = this.lolData.findIndex((item) => item.id === id);
-                    // this.lolData.splice(idx, 1)
-
-                    axios.get('deleteBrand')
-                        .then(rel => {
-                            console.log(rel);
-                            this.getAllList()
-                        })
-
-                },
-
-            }
-        })
-    </script>
-
 </body>
+<!-- 引入vue.js文件 -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+<!-- 日期时间的插件 可以用来设置获取 格式化日期时间的 -->
+<script src="./node_modules/moment/moment.js"></script>
+<!-- 引入axios插件 -->
+<script src="./node_modules/axios/dist/axios.js"></script>
+<script>
+    // 定义一个全局过滤器 转换时间显示
+    // 参数1 过滤器的名称
+    // 参数2: 过滤器过滤时执行的函数
+    Vue.filter('timeFilter', (input, yourFormat = 'YYYY年MM月DD日  HH:mm:ss') => {
+        return moment(input).format(yourFormat)
+    })
+    // 定义一个axios全局默认配置
+    axios.defaults.baseURL = 'http://localhost:5000';
+
+    // 创建根实例
+    let vm = new Vue({
+        el: "#app",
+        data: {
+            name: "",
+            desc: "",
+            lolData: [],
+            // 把过滤搜索的产生新列表数据
+            key: ""
+        },       
+        computed: {
+            searchList(val, oldVal) {
+                return this.lolData.filter(item => item.name.includes(this.key))
+            }
+        },
+        created() {
+            this.getAllList()
+        },
+        methods: {
+            getAllList() {
+                axios.get('/getBrandList')
+                    .then(res => {
+                        this.lolData = res.data.list
+                    }).catch(err => {
+                        console.log(err);
+                    })
+            },
+            addData() {
+                //  为空校验
+                if (!this.name.trim() || !this.desc.trim()) return alert("请输入正确的信息");
+
+                // 添加数据
+                // this.lolData.push({
+                //     id: this.lolData.length + 1,
+                //     name: this.name,
+                //     desc: this.desc,
+                //     date: new Date()
+                // });
+
+                // 向后端发起请求 添加品牌
+                axios.post('addBrand', {
+                        id: this.lolData.length + 1,
+                        name: this.name,
+                        desc: this.desc,
+                        time: new Date()
+                    })
+                    .then(res => {
+                        console.log(res);
+                        this.getAllList()
+                    })
+
+                this.name = "";
+                this.desc = ""
+            },
+            del(id) {
+                // 根据当前的项的id来删除这一条数据
+                // find  findIndex
+                // let idx = this.lolData.findIndex((item) => item.id === id);
+                // this.lolData.splice(idx, 1)
+
+                axios.get('/deleteBrand', {
+                        params: {
+                            id
+                        }
+                    })
+                    .then(rel => {
+                        console.log(rel);
+                        this.getAllList()
+                    })
+
+            },
+
+        }
+    })
+</script>
+
+
 
 </html>
