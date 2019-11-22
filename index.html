@@ -104,7 +104,7 @@
             lolData: [],
             // 把过滤搜索的产生新列表数据
             key: ""
-        },       
+        },
         computed: {
             searchList(val, oldVal) {
                 return this.lolData.filter(item => item.name.includes(this.key))
@@ -114,57 +114,41 @@
             this.getAllList()
         },
         methods: {
-            getAllList() {
-                axios.get('/getBrandList')
-                    .then(res => {
-                        this.lolData = res.data.list
-                    }).catch(err => {
-                        console.log(err);
-                    })
+            async getAllList() {
+                try {
+                    let res = await axios.get('/getBrandList')
+                    this.lolData = res.data.list
+                } catch (e) {
+                    console.log(e);
+                }
             },
-            addData() {
+            async addData() {
                 //  为空校验
                 if (!this.name.trim() || !this.desc.trim()) return alert("请输入正确的信息");
 
-                // 添加数据
-                // this.lolData.push({
-                //     id: this.lolData.length + 1,
-                //     name: this.name,
-                //     desc: this.desc,
-                //     date: new Date()
-                // });
-
                 // 向后端发起请求 添加品牌
-                axios.post('addBrand', {
-                        id: this.lolData.length + 1,
-                        name: this.name,
-                        desc: this.desc,
-                        time: new Date()
-                    })
-                    .then(res => {
-                        console.log(res);
-                        this.getAllList()
-                    })
-
+                await axios.post('addBrand', {
+                    id: this.lolData.length + 1,
+                    name: this.name,
+                    desc: this.desc,
+                    time: new Date()
+                })
+                this.getAllList()
                 this.name = "";
                 this.desc = ""
             },
-            del(id) {
+            async del(id) {
                 // 根据当前的项的id来删除这一条数据
                 // find  findIndex
                 // let idx = this.lolData.findIndex((item) => item.id === id);
                 // this.lolData.splice(idx, 1)
 
-                axios.get('/deleteBrand', {
-                        params: {
-                            id
-                        }
-                    })
-                    .then(rel => {
-                        console.log(rel);
-                        this.getAllList()
-                    })
-
+                await axios.get('/deleteBrand', {
+                    params: {
+                        id
+                    }
+                })
+                this.getAllList()
             },
 
         }
