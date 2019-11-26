@@ -37,3 +37,12 @@
 1.  更新axios 为asyn/await ,
 2. 将异步代码转变为类 同步代码,提升性能,
 3. .then() 结构更改为try()catch().
+
+### 2019-11-26
+
+1. git bash here 
+2. 键入 touch .gitignore新建一个文件
+3. 在文件中输入部署时需要忽略的文件名 如:node_modules
+
+
+
