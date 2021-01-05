@@ -4,7 +4,7 @@
   "description": "1. boostrap",
   "main": "vue.js",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "bootstrap": "^3.3.7",
     "moment": "^2.24.0",
     "vue": "^2.4.4"
